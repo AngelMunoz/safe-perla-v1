@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AngelMunoz/Perla/dev/perla.schema.json",
+  "fable": {
+    "project": "./Client.fsproj",
+    "outDir": "./dist",
+    "extension": ".js"
+  },
+  "build": {
+    "outDir": "./deploy"
+  },
+  "mountDirectories": {
+    "/": "./dist",
+    "/public": "./public"
+  },
+  "devServer": {
+    "port": 8080,
+    "proxy": {
+      "/api/{**catch-all}": "http://localhost:5000"
+    }
+  },
+  "dependencies": [
+    {
+      "name": "react",
+      "version": "18.2.0"
+    },
+    {
+      "name": "react-dom",
+      "version": "18.2.0"
+    }
+  ],
+  "devDependencies": [
+    {
+      "name": "remotedev",
+      "version": "0.2.9"
+    }
+  ]
+}

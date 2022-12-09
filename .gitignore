@@ -467,3 +467,4 @@ packages/
 paket-files/
 release.cmd
 release.sh
+**/dist
