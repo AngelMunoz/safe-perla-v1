@@ -20,18 +20,9 @@
   },
   "dependencies": [
     {
-      "name": "react",
-      "version": "18.2.0"
-    },
-    {
-      "name": "react-dom",
-      "version": "18.2.0"
+      "name": "@mdi/js",
+      "version": "7.1.96"
     }
   ],
-  "devDependencies": [
-    {
-      "name": "remotedev",
-      "version": "0.2.9"
-    }
-  ]
+  "devDependencies": []
 }

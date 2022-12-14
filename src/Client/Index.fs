@@ -3,6 +3,8 @@ module Index
 open Elmish
 open Fable.Remoting.Client
 open Shared
+open Sutil
+open Sutil.Bulma
 
 type Model = { Todos: Todo list; Input: string }
 
@@ -34,86 +36,70 @@ let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
         let cmd = Cmd.OfAsync.perform todosApi.addTodo todo AddedTodo
 
         { model with Input = "" }, cmd
-    | AddedTodo todo -> { model with Todos = model.Todos @ [ todo ] }, Cmd.none
+    | AddedTodo todo ->
+        { model with
+            Todos = model.Todos @ [ todo ]
+        },
+        Cmd.none
 
-open Feliz
-open Feliz.Bulma
 
 let navBrand =
-    Bulma.navbarBrand.div [
-        Bulma.navbarItem.a [
-            prop.href "https://safe-stack.github.io/"
+    bulma.navbar [
+        bulma.navbarItem.a [
+            Attr.href "https://safe-stack.github.io/"
             navbarItem.isActive
-            prop.children [
-                Html.img [
-                    prop.src "/public/favicon.png"
-                    prop.alt "Logo"
-                ]
-            ]
+            Html.img [ Attr.src "/public/favicon.png"; Attr.alt "Logo" ]
         ]
     ]
 
-let containerBox (model: Model) (dispatch: Msg -> unit) =
-    Bulma.box [
-        Bulma.content [
-            Html.ol [
-                for todo in model.Todos do
-                    Html.li [ prop.text todo.Description ]
-            ]
+let containerBox (model: IStore<Model>) (dispatch: Msg -> unit) =
+    let todos = Store.map (fun model -> model.Todos) model
+    let modelInput = Store.map (fun model -> model.Input) model
+    let validInput = Store.map (fun model -> model.Input |> Todo.isValid |> not) model
+
+    bulma.box [
+        bulma.content [
+            Html.ol [ Bind.each (todos, (fun todo -> Html.li [ Html.text todo.Description ])) ]
         ]
-        Bulma.field.div [
+        bulma.field.div [
             field.isGrouped
-            prop.children [
-                Bulma.control.p [
-                    control.isExpanded
-                    prop.children [
-                        Bulma.input.text [
-                            prop.value model.Input
-                            prop.placeholder "What needs to be done?"
-                            prop.onChange (fun x -> SetInput x |> dispatch)
-                        ]
-                    ]
+            bulma.control.p [
+                control.isExpanded
+                bulma.input.text [
+                    Attr.value (modelInput, SetInput >> dispatch)
+                    Attr.placeholder "What needs to be done?"
                 ]
-                Bulma.control.p [
-                    Bulma.button.a [
-                        color.isPrimary
-                        prop.disabled (Todo.isValid model.Input |> not)
-                        prop.onClick (fun _ -> dispatch AddTodo)
-                        prop.text "Add"
-                    ]
+            ]
+            bulma.control.p [
+                bulma.button.a [
+                    color.isPrimary
+                    Bind.attr ("disabled", validInput)
+                    Ev.onClick (fun _ -> dispatch AddTodo)
+                    Html.text "Add"
                 ]
             ]
         ]
     ]
 
-let view (model: Model) (dispatch: Msg -> unit) =
-    Bulma.hero [
-        hero.isFullHeight
+let view () =
+    let model, dispatch = Store.makeElmish init update ignore ()
+
+    bulma.hero [
+        Bulma.hero.isFullheight
         color.isPrimary
-        prop.style [
-            style.backgroundSize "cover"
-            style.backgroundImageUrl "https://unsplash.it/1200/900?random"
-            style.backgroundPosition "no-repeat center center fixed"
+        Attr.style [
+            Css.backgroundSize "cover"
+            Css.backgroundImageUrl "https://unsplash.it/1200/900?random"
+            Css.backgroundPosition "no-repeat center center fixed"
         ]
-        prop.children [
-            Bulma.heroHead [
-                Bulma.navbar [
-                    Bulma.container [ navBrand ]
-                ]
-            ]
-            Bulma.heroBody [
-                Bulma.container [
-                    Bulma.column [
-                        column.is6
-                        column.isOffset3
-                        prop.children [
-                            Bulma.title [
-                                text.hasTextCentered
-                                prop.text "SafePerla"
-                            ]
-                            containerBox model dispatch
-                        ]
-                    ]
+        bulma.heroHead [ bulma.navbar [ bulma.container [ navBrand ] ] ]
+        bulma.heroBody [
+            bulma.container [
+                bulma.column [
+                    column.is6
+                    column.isOffset3
+                    bulma.title.h1 [ text.hasTextCentered; Html.text "SafePerla" ]
+                    containerBox model dispatch
                 ]
             ]
         ]

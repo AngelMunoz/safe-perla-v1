@@ -1,11 +1,7 @@
 module App
 
 open Elmish
-open Elmish.React
+open Sutil
 
-Program.mkProgram Index.init Index.update Index.view
-#if DEBUG
-|> Program.withConsoleTrace
-#endif
-|> Program.withReactSynchronous "elmish-app"
-|> Program.run
+
+Program.mountElement "elmish-app" (Index.view ())
